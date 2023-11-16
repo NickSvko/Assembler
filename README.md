@@ -30,7 +30,17 @@ Please note:
 #### Notes
 * The assembler operates exclusively with positive and negative integers. Arithmetic follows the 2's complement method. 
 * The assembler supports characters represented in ASCII code.
-## Input File Structure
+## The program's input and output
+
+The assembler can take a maximum of 3 assembler files via the command line.
+For example:
+```
+>   assembler x.as y.as hello.as
+```
+For each file, it produces up to 3 corresponding output files named after the input file,  
+with extensions `.ent`, `.ext`,  `.ob` (depending on the content of the input file).
+
+### Input File Structure
 
 The input file should be an assembly file (.as extension) consisting of lines up to 80 characters. Each line can fall into one of these categories:
 
@@ -38,6 +48,26 @@ The input file should be an assembly file (.as extension) consisting of lines up
 * Comment line: Starts with the ';' character. These lines are ignored by the assembler.
 * Directive line: Contains a single directive.
 * Instruction line: Contains a single instruction.
+
+### Output Files
+* object file (`.obj`), which contains the machine code.
+* externals file (`.ext`), with details of all the places (addresses) in the machine code where a label defined as external is coded.
+* Entries file (`.ent`), with details on each label that is declared as an entry point (a symbol that appeared as an operand of the `.entry` directive,  
+  and is characterized in the symbol table as an entry).
+## How to Run
+The project was coded and compiled using Ubuntu, but it may run on all Linux versions.  
+  
+Use makefile to compile the project:
+```
+>   make
+```
+
+After preparing assembly files **with an `.as` extension**, open *terminal* and pass file names as arguments as following:
+
+```
+>   assembler x.as y.as z.as
+```
+
 ## Instructions
 
 Each instruction in the system is comprised of an operation and operands, encoded as 32-bit machine code.  
@@ -178,7 +208,364 @@ Note: If a label is specified before `.extern`, the assembler ignores it.
 
 ## Demo
 
+
+### Testing valid file
 Inpute file: validTest.as
+```
+;file name: 'validTest.as'
+;this file represent a valid input file to the assembler program.
+
+	labelV1: addi $1, -2, $3
+labelV2: add $10, $20, $30
+
+labelV4: blt $5  , $15,  V3
+
+	.entry labelV3
+	.entry 	labelV4
+
+
+blt $5   ,$24, labelV5
+
+	.entry labelV5
+
+jmp labelV5
+jmp $5
+
+labelV5: lh $4,14,$24
+
+labelV3: 	move $2, $12
+
+	.extern 	labelV11
+
+la   labelV11
+
+call labelV12
+
+	.extern labelV12
+
+labelV6: .db -128,-100	 ,-50,	 0,	 +10,	 +20 ,	30,	 127
+	.db 1, 2
+
+labelV7: .asciz "1he c2rrent 5tr+ng is v5lid!"
+	.asciz 	"asciz directive without label definition"
+
+labelV8: .dh -32768  , 200, +32767
+	.dh 10  , 20
+
+	.dw 100, 500
+labelV9: .dw -2147483648,+2147483647, 11
+
+labelV10: stop
+```
+Output files:  
+validTest.ent
+```
+labelV4 0108
+labelV5 0124
+labelV3 0128
+```
+validTest.ext
+```
+labelV11 0132
+labelV12 0136
+```
+
+validTest.ob
+```
+44 110
+0100 FE FF 23 28
+0104 40 F0 54 01
+0108 00 00 AF 44
+0112 0C 00 B8 44
+0116 7C 00 00 78
+0120 05 00 00 7A
+0124 0E 00 98 5C
+0128 40 60 40 04
+0132 00 00 00 7C
+0136 00 00 00 80
+0140 00 00 00 FC
+0144 80 9C CE 00 
+0148 0A 14 1E 7F 
+0152 01 02 31 68 
+0156 65 20 63 32 
+0160 72 72 65 6E 
+0164 74 20 35 74 
+0168 72 2B 6E 67 
+0172 20 69 73 20 
+0176 76 35 6C 69 
+0180 64 21 00 61 
+0184 73 63 69 7A 
+0188 20 64 69 72 
+0192 65 63 74 69 
+0196 76 65 20 77 
+0200 69 74 68 6F 
+0204 75 74 20 6C 
+0208 61 62 65 6C 
+0212 20 64 65 66 
+0216 69 6E 69 74 
+0220 69 6F 6E 00 
+0224 00 80 C8 00 
+0228 FF 7F 0A 00 
+0232 14 00 64 00 
+0236 00 00 F4 01 
+0240 00 00 00 00 
+0244 00 80 FF FF 
+0248 FF 7F 0B 00 
+0252 00 00
+```
+
+### Testing all the errors the program has
+Input file: errorTester.as
+```
+invalid.line.length.number.of.chars.so.far.is.49.111111111112222222222333333333344
+
+		;**********instructions**********
+
+		;invalid instruction name:
+instruction 5,6,7
+Add
+		;invalid number of operands:
+		
+	;'R' arithmetic and logical instruction:
+or
+and $3
+add $3, $19
+sub $3, $19, $8, $30
+
+	;'R' copy instructions:
+mvlo
+move $3
+mvhi $3, $19, $8
+	
+	;'I' arithmetic and logical instructions:
+ori
+andi $9
+addi $9, -45
+	subi $9, -45, $8, $9
+	
+	;'I' Conditional branching instructions:
+blt
+bne $5 
+beq $5, $24
+	blt $5, $24, loop, $30
+	
+	;'I' Instructions for loading and keeping in memory:
+lw
+lb $9
+sb $9, 34
+lh $9, 34, $2, $4
+	
+	;'J' instructions - jump:
+jmp
+jmp label1, label2
+jmp $6, $7
+
+	;'J' instructions - la / call:
+la
+call label1, label2
+	
+	;stop instruction:
+stop ab12
+
+		;invalid operands:
+		
+	;'R' arithmetic and logical instruction:
+add $3, symbol, $8
+or  3, $19, $8
+and $3, $19, $32
+sub $3, $32, $8
+
+	;'R' copy instructions:
+move $3, symbol
+mvhi 3, $5
+mvlo $40, $5
+
+	;'I' arithmetic and logical instructions:
+ori 9, -45, $8
+andi $9, 100000000, $8
+addi $9, -45, label
+nori $65, -45, $8
+
+	;'I' Conditional branching instructions:
+blt 5, $24, loop
+bne $5, $44, loop
+beq $5, $24, $3
+bgt $5, $24, 5
+
+	;'I' Instructions for loading and keeping in memory:
+lw 9, 34, $2
+lb $9, $34, $2
+sb $9, 34, symbol
+lh $9, 34, $32
+sw $9, symbol, $20
+
+	;'J' instructions - jump:
+jmp 44
+
+	;'J' instructions - la / call:
+la $4
+call 4
+
+
+;		**********directives**********
+		
+		;invalid directive name:
+.Asciz "abc"
+.directive 9, 7, 2
+
+		;invalid number of operands:
+.db
+.dw
+.dh
+.asciz
+
+		;invalid operands:
+.db $5
+.db symbol
+.db 128
+.db -129
+
+.dh $5
+.dh symbol
+.dh 32768
+.dh -32769
+
+.dw $5
+.dw symbol
+.dw 2147483648
+.dw -2147483649
+
+.asciz abc
+.asciz "abc
+.asciz "abc""
+.asciz ""abc"
+.asciz ""abc
+.asciz abc""
+.asciz "	"
+.asciz """
+
+		;**********commas**********
+		
+add ,$3, $19, $20
+add ,	$3, $19, $20
+mvhi $3, $19,
+mvhi $3, $19	,
+addi $9,,-45, $8
+blt $5,	,$24, loop
+lh $9 34, $2
+lh $9,34	 $2
+
+;		**********labels**********
+add:
+asciz:
+label:
+label :
+1abel:
+l able:
+lab;l:
+theLengthOfLabelLimitedTo31chars:
+
+labelV1: .asciz "abcd"
+labelV1: .asciz "abcd"
+labelV1: add $1, $2, $3
+.extern labelV1
+```
+Output errors:
+```
+Error! file 'errorTester .as' line 1: line is too long.
+Error! file 'errorTester.as' line 6: Invalid instruction name.
+Error! file 'errorTester.as' line 7: Invalid instruction name.
+Error! file 'errorTester.as' line 11: Missing Operands.
+Error! file 'errorTester.as' line 12: Incorrect number of registers. 'R' arithmetic and logical instructions should receive 3 registers.
+Error! file 'errorTester.as' line 13: Incorrect number of registers. 'R' arithmetic and logical instructions should receive 3 registers.
+Error! file 'errorTester.as' line 14: Incorrect number of registers. 'R' arithmetic and logical instructions should receive 3 registers.
+Error! file 'errorTester.as' line 17: Missing Operands.
+Error! file 'errorTester.as' line 18: Incorrect number of registers. 'R' copy instructions should receive 2 registers.
+Error! file 'errorTester.as' line 19: Incorrect number of registers. 'R' copy instructions should receive 2 registers.
+Error! file 'errorTester.as' line 22: Missing Operands.
+Error! file 'errorTester.as' line 23: Incorrect number of operands. 'I' copy/loading/saving memory instructions should receive 3 operands.
+Error! file 'errorTester.as' line 24: Incorrect number of operands. 'I' copy/loading/saving memory instructions should receive 3 operands.
+Error! file 'errorTester.as' line 25: Incorrect number of operands. 'I' copy/loading/saving memory instructions should receive 3 operands.
+Error! file 'errorTester.as' line 28: Missing Operands.
+Error! file 'errorTester.as' line 29: Incorrect number of operands. 'I' Conditional branching instructions should receive 3 operands.
+Error! file 'errorTester.as' line 30: Incorrect number of operands. 'I' Conditional branching instructions should receive 3 operands.
+Error! file 'errorTester.as' line 31: Incorrect number of operands. 'I' Conditional branching instructions should receive 3 operands.
+Error! file 'errorTester.as' line 34: Missing Operands.
+Error! file 'errorTester .as' line 35: Incorrect number of operands. 'I' copy/Loading/saving memory instructions should receive 3 operands.
+Error! file 'errorTester.as' line 36: Incorrect number of operands. 'I' copy/loading/saving memory instructions should receive 3 operands.
+Error! file 'errorTester.as' line 37: Incorrect number of operands. 'I' copy/loading/saving memory instructions should receive 3 operands.
+Error! file 'errorTester.as' line 40: Missing Operands.
+Error! file 'errorTester.as' line 41: Incorrect number of operands, jump instruction should receive only one operand.
+Error! file 'errorTester.as' line 42: Incorrect number of operands, jump instruction should receive only one operand.
+Error! file 'errorTester.as' line 45: Missing Operands.
+Error! file 'errorTester.as' line 46: Incorrect number of operands, jump instruction should receive only one operand.
+Error! file 'errorTester.as' line 49: Excessive text after 'stop' instruction.
+Error! file 'errorTester.as' line 54: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 55: Invalid register. register must start with '$' and represent a number between 0-31
+Error! file 'errorTester.as' line 56: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 57: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 57: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 60: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 61: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 62: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 65: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester .as' line 66: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester.as' line 67: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 68: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 71: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 72: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester .as' line 73: Invalid label, Syntactic error.
+Error! file 'errorTester .as' line 74: Invalid label, Syntactic error.
+Error! file 'errorTester.as' line 77: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester .as' line 78: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester.as' line 79: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester.as' line 80: Invalid register. register must start with '$' and represent a number between 0-31.
+Error! file 'errorTester .as' line 81: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 84: Invalid label, Syntactic error.
+Error! file 'errorTester .as' line 87: Invalid label, Syntactic error.
+Error! file 'errorTester .as' line 88: Invalid label, Syntactic error.
+Error! file 'errorTester.as' line 94: Unrecognized directive word.
+Error! file 'errorTester.as' line 95: unrecognized directive word.
+Error! file 'errorTester.as' line 98: Missing Operands.
+Error! file 'errorTester.as' line 99: Missing Operands.
+Error! file 'errorTester.as' line 100: Missing Operands.
+Error! file 'errorTester.as' line 101: Missing Operands.
+Error! file 'errorTester .as' line 104: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 105: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 106: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 107: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 109: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 112: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 114: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 115: Invalid operand, Operand must be an integer in the range defined by the instruction/directive.
+Error! file 'errorTester .as' line 119: The string is not bounded by quotes.
+Epror! file 'errorTester as' line 120: The string is not bounded by quotes.
+Error! file 'errorTester as' Line 121: The string is not bounded by quotes.
+Epror! file 'errorTester as' line 122: The string is not bounded by quotes.
+Error! file 'errorTester .as' line 123: The string is not bounded by quotes.
+Error! file 'errorTester .as' line 124: The string is not bounded by quotes.
+Error! file 'errorTester .as' line 125: String contain char that cannot be printed.
+Error! file 'errorTester .as' line 126: The string is not bounded by quotes.
+Error! file 'errorTester .as' line 130: A comma appears before the first variable or after the last variable.
+Error! file 'errorTester .as' line 131: A comma appears before the first variable or after the last variable.
+Error! file 'errorTester .as' line 132: A comma appears before the first variable or after the last variable.
+Error! file 'errorTester .as' line 133: A comma appears before the first variable or after the last variable.
+Error! file 'errorTester .as' line 134: multiple commas.
+Error! file 'errorTester.as' line 135: multiple commas.
+Epror! file 'errorTester .as' Line 136: Missing comma.
+Error! file 'errorTester .as' line 137: Missing comma.
+Error! file 'errorTester .as' Line 140: Invalid label, the Label name is a reserved instruction/directive word.
+Error! file 'errorTester .as' line 141: Invalid label, the Label name is a reserved instruction/directive word.
+Error! file 'errorTester .as' line 142: Missing instruction/directive after label definition.
+Eppop! file 'errorTester .as' Line 143: Invalid Label, Syntactic error.
+Eppop! file 'errorTester .as' Line 144: Invalid Label, Syntactic error.
+Eppop! file 'errorTester .as' Line 145: Invalid label, Syntactic error.
+Error! file 'errorTester .as' Line 146: Invalid Label, Syntactic error.
+Error! file 'errorTester as' Line 147: The Label name is Longer than 31 characters.
+Erpor! file 'errorTester .as' line 150: Label is already defined.
+Erpor! file 'errorTester .as' line 151: Label is already defined.
+Erpor! file 'errorTester .as' line 152: Label is already defined.
+```
 
 
 
