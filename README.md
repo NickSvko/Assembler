@@ -1,7 +1,7 @@
 
 # Imaginary Assembly Language Assembler
 
-This project implements an assembler that generates machine code files based on an assembly language program file provided.
+This project implements an assembler that generates machine code files based on a provided assembly language file.
 
 It aims to offer a tool for understanding and practicing low-level programming concepts without a specific real-world hardware platform or instruction set architecture.
 
