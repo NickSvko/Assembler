@@ -13,7 +13,6 @@ Please note:
 
 
 
-
 ## Hardware
 
 * CPU
@@ -30,6 +29,25 @@ Please note:
 #### Notes
 * The assembler operates exclusively with positive and negative integers. Arithmetic follows the 2's complement method. 
 * The assembler supports characters represented in ASCII code.
+
+
+
+## How to Run
+The project was coded and compiled using Ubuntu, but it may run on all Linux versions.  
+  
+Use makefile to compile the project:
+```
+>   make
+```
+
+After preparing assembly files **with an `.as` extension**, open *terminal* and pass file names as arguments as following:
+
+```
+>   assembler x.as y.as z.as
+```
+
+
+
 ## The program's input and output
 
 The assembler can take a maximum of 3 assembler files via the command line.
@@ -54,19 +72,8 @@ The input file should be an assembly file (.as extension) consisting of lines up
 * externals file (`.ext`), with details of all the places (addresses) in the machine code where a label defined as external is coded.
 * Entries file (`.ent`), with details on each label that is declared as an entry point (a symbol that appeared as an operand of the `.entry` directive,  
   and is characterized in the symbol table as an entry).
-## How to Run
-The project was coded and compiled using Ubuntu, but it may run on all Linux versions.  
+
   
-Use makefile to compile the project:
-```
->   make
-```
-
-After preparing assembly files **with an `.as` extension**, open *terminal* and pass file names as arguments as following:
-
-```
->   assembler x.as y.as z.as
-```
 
 ## Instructions
 
@@ -143,6 +150,7 @@ Type J instructions:
 | 31 - 26  | 25  | 24 - 0                                 |
 
 
+
 ## Directives
 
 #### Structure of a directive
@@ -206,8 +214,10 @@ Example:
   
 Note: If a label is specified before `.extern`, the assembler ignores it.
 
-## Demo
 
+
+
+## Demo
 
 ### Testing valid file
 Inpute file: validTest.as
@@ -569,8 +579,5 @@ Erpor! file 'errorTester .as' line 152: Label is already defined.
 
 
 
-
 ## Author
-
 #### *Nick Savchenko*
-
