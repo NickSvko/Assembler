@@ -37,13 +37,13 @@ Please note:
 The project was coded and compiled using Ubuntu, but it may run on all Linux versions.  
   
 Use makefile to compile the project:
-```
+```bash
 >   make
 ```
 
 After preparing assembly files **with an `.as` extension**, open *terminal* and pass file names as arguments as following:
 
-```
+```bash
 >   assembler x.as y.as z.as
 ```
 
@@ -219,7 +219,7 @@ Note: If a label is specified before `.extern`, the assembler ignores it.
 
 ### Testing valid file
 Inpute file: validTest.as
-```
+```bash
 ; file name: 'validTest.as'
 ; this file represents a valid input file to the assembler program.
 
@@ -324,7 +324,7 @@ validTest.ob
 
 ### Testing all the errors the program has
 Input file: errorTester.as
-```
+```bash
 invalid.line.length.number.of.chars.so.far.is.49.111111111112222222222333333333344
 
 		;**********instructions**********
@@ -375,7 +375,7 @@ call label1, label2
 	;stop instruction:
 stop ab12
 
-		;invalid operands:
+		; invalid operands:
 		
 	;'R' arithmetic and logical instruction:
 add $3, symbol, $8
