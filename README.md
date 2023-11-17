@@ -1,7 +1,8 @@
 
 # Imaginary Assembly Language Assembler
 
-This project implements an assembler that generates machine code files based on a provided assembly language file.
+This program interprets an imaginary assembly language, converting assembly files into machine code files.  
+Developed in C, it functions as a two-pass assembler. The implementation of this program is based on a two-pass assembly approach.
 
 It aims to offer a tool for understanding and practicing low-level programming concepts without a specific real-world hardware platform or instruction set architecture.
 
