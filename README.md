@@ -20,10 +20,10 @@ Please note:
 * Registers:
     - 32 general registers labeled as $0, $1, ..., $31.
     - Each register holds a size of 32 bits.
-    - Bit number 0 represents the least significant bit,    bit number 31 represents the most significant bit.
+    - Bit number 0 represents the least significant bit and bit number 31 represents the most significant bit.
 
 #### Addresses
-* The addrsses ranging from 0 to (2^25-1), where each cell size is 1 byte.
+* The addresses range from 0 to (2^25-1), where each cell size is 1 byte.
 *  A memory address is represented by 25 bits as an unsigned number.
 
 #### Notes
@@ -50,13 +50,10 @@ After preparing assembly files **with an `.as` extension**, open *terminal* and 
 
 ## The program's input and output
 
-The assembler can take a maximum of 3 assembler files via the command line.
-For example:
-```
->   assembler x.as y.as hello.as
-```
-For each file, it produces up to 3 corresponding output files named after the input file,  
-with extensions `.ent`, `.ext`,  `.ob` (depending on the content of the input file).
+The assembler can take a maximum of 3 assembler files via the command line.  
+
+It creates up to three new files based on each input file.  
+These new files are named after the input file, using extensions like `.ent`, `.ext`, or `.ob`, depending on the content of the input file.
 
 ### Input File Structure
 
@@ -86,7 +83,7 @@ Each instruction contains an operation code (opcode) that identifies its functio
 
 Instructions are categorized into three types: type R, type I, and type J.
 
-#### Instruction Table:
+### Instruction Table
 
 | Name | Type | Structure               | Operation                                            | 
 | :--- | :--- | ----------------------- | :----------------------------------------------------| 
@@ -120,7 +117,7 @@ Instructions are categorized into three types: type R, type I, and type J.
 | stop | J    | stop                    | stop the program                                     | 
 
 *Notes*:
-* The instructions names are case sensitive.
+* The instruction's names are case sensitive.
 * *rd / rt / rs* -   register in the range 0 to 31.
 * *R[rd] / R[rt]] / R[rs]* - The content that is stored in the register.
 * *immed* -  32-bit integer.
@@ -135,25 +132,25 @@ Instructions are categorized into three types: type R, type I, and type J.
 The instructions are coded into machine code as follows:
 
 Type R instructions:
-| opcode   | rs      | rt      | rd      | funct  | unsed |
-| :------- | :------ | :------ | :-------| :----- | :---- |
-| 31 - 26  | 25 - 21 | 20 - 16 | 15 - 11 | 10 - 6 | 5 - 0 |
+| opcode   | rs      | rt      | rd      | funct  | unused |
+| :------- | :------ | :------ | :-------| :----- | :----  |
+| 31 - 26  | 25 - 21 | 20 - 16 | 15 - 11 | 10 - 6 | 5 - 0  |
 
  Type Instructions instructions:
-| opcode   | rs      | rt      | immed                    |
-| :------- | :------ | :------ | :----------------------- |
-| 31 - 26  | 25 - 21 | 20 - 16 | 15 - 0                   |
+| opcode   | rs      | rt      | immed                     |
+| :------- | :------ | :------ | :-------------------------|
+| 31 - 26  | 25 - 21 | 20 - 16 | 15 - 0                    |
 
 Type J instructions:
-| opcode   | reg | address                                |
-| :------- | :-- | :------------------------------------- |
-| 31 - 26  | 25  | 24 - 0                                 |
+| opcode   | reg | address                                 |
+| :------- | :-- | :---------------------------------------|
+| 31 - 26  | 25  | 24 - 0                                  |
 
 
 
 ## Directives
 
-#### Structure of a directive
+### Structure of a directive
 * Label (optional)
 * The name of the directive
 * Operands
@@ -163,14 +160,14 @@ Type J instructions:
   
 The operands of these directives are integers (one or more) with exactly one comma between every two parameters.
 
-This directives instruct the assembler to allocate space in the data image, where the values of the parameters will be stored, and to advance the data counter (DC), according to the number and size of the values.
-- Parameters defined by the command statement `.db` Occupies 1 byte.
-- Parameters defined by the directive sentence `.dh` Occupies 2 bytes.
-- Parameters defined by the directive `.dw` Occupies 4 bytes.
+These directives instruct the assembler to allocate space in the data image, where the values of the parameters will be stored, and to advance the data counter (DC), according to the number and size of the values.
+- Parameters defined by the command statement `.db` occupy 1 byte.
+- Parameters defined by the directive sentence `.dh` occupy 2 bytes.
+- Parameters defined by the directive `.dw` occupy 4 bytes.
 
 Notes:
 - Each number must be of an appropriate size, which will not exceed the representation limits of the defined data type.
-- If a label is defined in the instruction sentence, then this label receives the value of the data counter (beforethe promotion), and is inserted into the symbol table.
+- If a label is defined in the instruction sentence, then this label receives the value of the data counter (before the promotion), and is inserted into the symbol table.
 
 Example:
 ```  
@@ -181,9 +178,9 @@ XYZ: .dh 0, -6431, 1700, 3, -1
 
 
 #### Directive `.asciz`
-The operand of these directive is a single valid *String*.
+The operand of this directive is a single valid *String*.
   
-The string's characters are encoded to according to the corresponding ASCII values,  
+The string's characters are encoded according to the corresponding ASCII values
 and are stored in the data image, each character using one byte.
   
 To mark the string's end, '0/' is added.  
@@ -192,10 +189,10 @@ If a label is included in the line, it gets the data counter's current value (be
 
 Example:
 ```
-STR: .asciz "hello world"
+STR: .asciz "Hello world"
 ```
 #### Directive `.entry`
-The parameter of this directive is a name of a label defined in the current file.  
+The parameter of this directive is the name of a label defined in the current file.  
 The purpose of the `.entry` directive is to characterize this label in a way that allows assembly code found in other files to use it as an instruction operand.
 
 Example:
@@ -205,7 +202,7 @@ Example:
 
 Directive: `.extern` 
 
-The parameter of this directive is the name of a label that is not defined in the current file. Its purpose is to notify the assembler that the specified label is defined in another source file and that the current file's assembly code make use of this label.
+The parameter of this directive is the name of a label that is not defined in the current file. Its purpose is to notify the assembler that the specified label is defined in another source file and that the current file's assembly code makes use of this label.
 
 Example:
    ```
@@ -222,8 +219,8 @@ Note: If a label is specified before `.extern`, the assembler ignores it.
 ### Testing valid file
 Inpute file: validTest.as
 ```
-;file name: 'validTest.as'
-;this file represent a valid input file to the assembler program.
+; file name: 'validTest.as'
+; this file represents a valid input file to the assembler program.
 
 	labelV1: addi $1, -2, $3
 labelV2: add $10, $20, $30
